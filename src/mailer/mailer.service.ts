@@ -46,6 +46,7 @@ export class MailerService {
             }else{
                 let template = handlebars.compile(html);
                 let replacements = {
+                    domain: process.env.DOMAIN
                 };
                 let htmlToSend = template(replacements);
                 const mailOptions = {
@@ -80,7 +81,8 @@ export class MailerService {
             }else{
                 let template = handlebars.compile(html);
                 let replacements = {
-                    code: code
+                    code: code,
+                    domain: process.env.DOMAIN
                 };
                 let htmlToSend = template(replacements);
                 const mailOptions = {
@@ -115,7 +117,8 @@ export class MailerService {
             }else{
                 let template = handlebars.compile(html);
                 let replacements = {
-                    code: code
+                    code: code,
+                    domain: process.env.DOMAIN
                 };
                 let htmlToSend = template(replacements);
                 const mailOptions = {
