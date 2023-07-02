@@ -195,7 +195,7 @@ export class MailerService {
 
             const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
 
-            const pdfDoc = pdfMake.createPdf(docDefinition);
+            const pdfDoc = pdfMake.createPdf(docDefinition, null, null, pdfFonts.pdfMake.vfs);
 
             const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
                 pdfDoc.getBuffer((buffer) => {
