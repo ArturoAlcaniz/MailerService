@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import fs from 'fs'
 import path from 'path'
 import handlebars from 'handlebars'
+import { Invoice } from "@entities-lib/src/entities/invoice.entity";
 
 @Injectable()
 export class MailerService {
@@ -125,6 +126,41 @@ export class MailerService {
                     from: thisOut.user,
                     to: email,
                     subject: "[TI-SHOP] Register Code",
+                    html: htmlToSend,
+                    attachments: [{
+                        filename: 'Logo-TISHOP',
+                        path: path.resolve(__dirname,'./templates/Register/Logo-TISHOP.png'),
+                        cid: 'Logo-TISHOP'
+                    }]
+                };
+        
+                thisOut.transporter.sendMail(mailOptions, function(error) {
+                    if (error) {
+                        console.log(error);
+                    }
+                });
+            }
+        })
+    }
+
+    public async sendInvoice(invoice: Invoice) {
+
+        let thisOut = this
+
+        this.readHTMLFile(path.resolve(__dirname, "./templates/Register/register.html"), function (err, html) {
+ 
+            if(err){
+                console.log(err)
+            }else{
+                let template = handlebars.compile(html);
+                let replacements = {
+                    domain: process.env.DOMAIN
+                };
+                let htmlToSend = template(replacements);
+                const mailOptions = {
+                    from: thisOut.user,
+                    to: invoice.buyer.email,
+                    subject: "[TI-SHOP] Invoice",
                     html: htmlToSend,
                     attachments: [{
                         filename: 'Logo-TISHOP',

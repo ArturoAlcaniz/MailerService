@@ -10,13 +10,20 @@
         "target": "es6",
         "sourceMap": true,
         "allowJs": true,
+        "paths": {
+            "@entities-lib/*": ["./../entities-lib/*"],
+            "@root/*": ["./*"]
+        },
         "outDir": "./dist",
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "incremental": true,
         "types": ["node"],
-        "typeRoots": ["./node_module/@types", "./src/types"]
+        "typeRoots": ["./node_modules/@types", "./src/types"],
+        "preserveConstEnums": true
     },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "**/*.spec.ts"]
+    "typeAcquisition": {"include": ["jest"]},
+
+    "include": ["src/**/*", "../entities-lib/src/requests/redeemCodeToken.dto.ts"],
+    "exclude": ["node_modules", "**/*.spec.ts", "./dist"]
 }

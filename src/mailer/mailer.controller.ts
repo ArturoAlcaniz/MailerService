@@ -6,6 +6,7 @@ import { DataChangedConfirmDto } from "./dtos/dataChangedConfirm.dto"
 import { CodeLoginDto } from "./dtos/codeLogin.dto"
 import { CodeRegisterDto } from "./dtos/codeRegister.dto"
 import { MailerService } from "./mailer.service";
+import { Invoice } from "@entities-lib/src/entities/invoice.entity";
 
 @ApiTags("Mailer Controller")
 @Controller("mailer")
@@ -46,6 +47,17 @@ export class MailerController {
     ) {
         this.mailerService.sendCodeRegister(payload.email, payload.code);
         this.logger.info(`sendCodeRegister Email Sent to ${payload.email}`);
+        response.status(200);
+    }
+
+    @ApiOkResponse()
+    @Post("sendInvoice")
+    async sendIncoice(
+        @Body() payload: Invoice,
+        @Res({passthrough: true}) response: Response
+    ) {
+        this.mailerService.sendInvoice(payload);
+        this.logger.info(`sendInvoice Email Sent to ${payload.buyer.email}`);
         response.status(200);
     }
 }

@@ -5,3 +5,4 @@ mariadb
 certs/localhost/sslcache
 log
 .env
+**/dist
