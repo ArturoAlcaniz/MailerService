@@ -191,11 +191,13 @@ export class MailerService {
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
         try {
+            pdfMake.vfs = pdfFonts.pdfMake.vfs;
+            
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
 
             const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
 
-            const pdfDoc = pdfMake.createPdf(docDefinition, null, null, pdfFonts.pdfMake.vfs);
+            const pdfDoc = pdfMake.createPdf(docDefinition);
 
             const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
                 pdfDoc.getBuffer((buffer) => {
