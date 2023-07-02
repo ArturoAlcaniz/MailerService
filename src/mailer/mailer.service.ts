@@ -231,14 +231,28 @@ export class MailerService {
     }
 
     public createInvoice(invoice: Invoice): any {
+        const tableBody = invoice.items.map((item, index) => [
+            { text: `${index + 1}. ${item.product.productName}`, alignment: 'left' },
+            { text: item.product.user.userName, alignment: 'left' },
+            { text: item.product.price.toString(), alignment: 'right' }
+        ]);
+    
         return {
             content: [
                 { text: 'Factura', style: 'header' },
-                'Productos:',
                 {
-                    ul: invoice.items.map((item, index) => ({
-                        text: `${index + 1}. ${item.product.productName} - Vendedor: ${item.product.user.userName} - Precio: ${item.product.price}`,
-                    })),
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', '*'],
+                        body: [
+                            [
+                                { text: 'Producto', style: 'tableHeader', alignment: 'left' },
+                                { text: 'Vendedor', style: 'tableHeader', alignment: 'left' },
+                                { text: 'Precio', style: 'tableHeader', alignment: 'right' }
+                            ],
+                            ...tableBody
+                        ]
+                    }
                 },
                 `Precio total: ${invoice.price}`,
             ],
@@ -249,6 +263,11 @@ export class MailerService {
                     alignment: 'center',
                     margin: [0, 0, 0, 10],
                 },
+                tableHeader: {
+                    bold: true,
+                    fontSize: 12,
+                    color: 'black'
+                }
             },
         };
     }
