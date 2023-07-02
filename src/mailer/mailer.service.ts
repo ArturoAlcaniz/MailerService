@@ -190,24 +190,29 @@ export class MailerService {
     }
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
-        const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
+        try {
+            const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
 
-        const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
+            const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
 
-        const pdfDoc = pdfMake.createPdf(docDefinition);
+            const pdfDoc = pdfMake.createPdf(docDefinition);
 
-        const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
-            pdfDoc.getBuffer((buffer) => {
-                if (!Buffer.isBuffer(buffer)) {
-                    return reject(new Error('Failed to generate PDF buffer'));
-                }
-                resolve(buffer);
+            const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
+                pdfDoc.getBuffer((buffer) => {
+                    if (!Buffer.isBuffer(buffer)) {
+                        return reject(new Error('Failed to generate PDF buffer'));
+                    }
+                    resolve(buffer);
+                });
             });
-        });
 
-        fs.writeFileSync(pdfPath, pdfBytes); // Guarda el archivo PDF
+            fs.writeFileSync(pdfPath, pdfBytes); // Guarda el archivo PDF
 
-        return pdfPath;
+            return pdfPath;
+        } catch (error) {
+            console.error('Error al generar el PDF:', error);
+            throw error;
+        }
     }
 
     public createInvoice(invoice: Invoice): any {
