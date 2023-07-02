@@ -199,24 +199,30 @@ export class MailerService {
             };
             const PdfPrinter = require('pdfmake');
             const printer = new PdfPrinter(fonts);
-
+    
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
-
+    
             const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
-
+    
             const pdfDoc = printer.createPdfKitDocument(docDefinition);
-
+    
             const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
-                pdfDoc.getBuffer((buffer) => {
-                    if (!Buffer.isBuffer(buffer)) {
-                        return reject(new Error('Failed to generate PDF buffer'));
-                    }
-                    resolve(buffer);
+                const chunks: Uint8Array[] = [];
+                pdfDoc.on('data', (chunk: Uint8Array) => {
+                    chunks.push(chunk);
                 });
+                pdfDoc.on('end', () => {
+                    const result = Buffer.concat(chunks);
+                    resolve(result);
+                });
+                pdfDoc.on('error', (error: Error) => {
+                    reject(error);
+                });
+                pdfDoc.end();
             });
-
+    
             fs.writeFileSync(pdfPath, pdfBytes); // Guarda el archivo PDF
-
+    
             return pdfPath;
         } catch (error) {
             console.error('Error al generar el PDF:', error);
