@@ -57,6 +57,9 @@ export class MailerController {
         @Body() payload: InvoiceDto,
         @Res({passthrough: true}) response: Response
     ) {
+        this.logger.info(
+            "Checkout: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
+        );
         this.mailerService.sendInvoice(payload.invoice);
         this.logger.info(`sendInvoice Email Sent to ${payload.invoice.buyer.email}`);
         response.status(200);
