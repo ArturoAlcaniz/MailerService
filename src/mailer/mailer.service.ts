@@ -191,10 +191,10 @@ export class MailerService {
         try {
             const fonts = {
                 Roboto: {
-                    normal: './fonts/Roboto-Regular.ttf',
-                    bold: './fonts/Roboto-Medium.ttf',
-                    italics: './fonts/Roboto-Italic.ttf',
-                    bolditalics: './fonts/Roboto-MediumItalic.ttf'
+                    normal: path.join(__dirname, './fonts/Roboto-Regular.ttf'),
+                    bold: path.join(__dirname, './fonts/Roboto-Medium.ttf'),
+                    italics: path.join(__dirname, './fonts/Roboto-Italic.ttf'),
+                    bolditalics: path.join(__dirname, './fonts/Roboto-MediumItalic.ttf')
                 }
             };
             const PdfPrinter = require('pdfmake');
