@@ -237,30 +237,43 @@ export class MailerService {
             { text: item.product.price.toString(), alignment: 'right' }
         ]);
     
+        const today = new Date();
+        const formattedDate = `${today.getDate()} - ${this.getMonthName(today.getMonth())} ${today.getFullYear()}`;
+    
         return {
             content: [
-                { text: 'Factura', style: 'header' },
+                { text: 'Invoice', style: 'header', alignment: 'right' },
+                { text: `Invoice ID: ${invoice.id}`, fontSize: 10, alignment: 'right' },
                 {
                     table: {
                         headerRows: 1,
                         widths: ['*', '*', '*'],
                         body: [
                             [
-                                { text: 'Producto', style: 'tableHeader', alignment: 'left' },
-                                { text: 'Vendedor', style: 'tableHeader', alignment: 'left' },
-                                { text: 'Precio', style: 'tableHeader', alignment: 'right' }
+                                { text: 'Product', style: 'tableHeader', alignment: 'left' },
+                                { text: 'Seller', style: 'tableHeader', alignment: 'left' },
+                                { text: 'Price', style: 'tableHeader', alignment: 'right' }
                             ],
                             ...tableBody
                         ]
                     }
                 },
-                `Precio total: ${invoice.price}`,
+                {
+                    layout: 'noBorders',
+                    table: {
+                        widths: ['50%', '50%'],
+                        body: [
+                            ['Payments Received', { text: invoice.price.toString(), alignment: 'right' }],
+                            [formattedDate, '']
+                        ]
+                    },
+                    margin: [0, 10, 0, 0]
+                }
             ],
             styles: {
                 header: {
                     fontSize: 20,
                     bold: true,
-                    alignment: 'center',
                     margin: [0, 0, 0, 10],
                 },
                 tableHeader: {
@@ -270,5 +283,14 @@ export class MailerService {
                 }
             },
         };
+    }
+
+    public getMonthName(month: number): string {
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+    
+        return monthNames[month];
     }
 }
