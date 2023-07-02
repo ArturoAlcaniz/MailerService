@@ -4,8 +4,6 @@ import fs from 'fs'
 import path from 'path'
 import handlebars from 'handlebars'
 import { Invoice } from "@entities-lib/src/entities/invoice.entity";
-import * as pdfMake from 'pdfmake/build/pdfmake'; // Importa pdfMake
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'; // Importa las fuentes de pdfMake
 
 @Injectable()
 export class MailerService {
@@ -191,7 +189,7 @@ export class MailerService {
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
         try {
-            pdfMake.fonts = {
+            const fonts = {
                 Roboto: {
                     normal: './fonts/Roboto-Regular.ttf',
                     bold: './fonts/Roboto-Medium.ttf',
@@ -199,14 +197,14 @@ export class MailerService {
                     bolditalics: './fonts/Roboto-MediumItalic.ttf'
                 }
             };
-
-            pdfMake.vfs = pdfFonts.pdfMake.vfs;
+            const PdfPrinter = require('pdfmake');
+            const printer = new PdfPrinter(fonts);
 
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
 
             const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
 
-            const pdfDoc = pdfMake.createPdf(docDefinition);
+            const pdfDoc = printer.createPdf(docDefinition);
 
             const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
                 pdfDoc.getBuffer((buffer) => {
