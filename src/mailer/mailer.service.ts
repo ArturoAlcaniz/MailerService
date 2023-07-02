@@ -191,14 +191,14 @@ export class MailerService {
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
         try {
-            pdfMake.addFonts({
+            pdfMake.fonts = {
                 Roboto: {
                     normal: './fonts/Roboto-Regular.ttf',
                     bold: './fonts/Roboto-Medium.ttf',
                     italics: './fonts/Roboto-Italic.ttf',
                     bolditalics: './fonts/Roboto-MediumItalic.ttf'
                 }
-            });
+            };
 
             pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
