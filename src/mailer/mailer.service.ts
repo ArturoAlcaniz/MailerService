@@ -191,8 +191,17 @@ export class MailerService {
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
         try {
+            pdfMake.addFonts({
+                Roboto: {
+                    normal: './fonts/Roboto-Regular.ttf',
+                    bold: './fonts/Roboto-Medium.ttf',
+                    italics: './fonts/Roboto-Italic.ttf',
+                    bolditalics: './fonts/Roboto-MediumItalic.ttf'
+                }
+            });
+
             pdfMake.vfs = pdfFonts.pdfMake.vfs;
-            
+
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
 
             const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
