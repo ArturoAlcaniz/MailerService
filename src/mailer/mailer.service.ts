@@ -190,7 +190,7 @@ export class MailerService {
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
         return new Promise<string>((resolve, reject) => {
-            const doc: PDFDocument = new PDFDocument();
+            const doc = new PDFDocument();
 
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
             
