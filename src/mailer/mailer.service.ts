@@ -4,7 +4,8 @@ import fs from 'fs'
 import path from 'path'
 import handlebars from 'handlebars'
 import { Invoice } from "@entities-lib/src/entities/invoice.entity";
-import * as PDFDocument from 'pdfkit';
+import * as pdfMake from 'pdfmake/build/pdfmake'; // Importa pdfMake
+import * as pdfFonts from 'pdfmake/build/vfs_fonts'; // Importa las fuentes de pdfMake
 
 @Injectable()
 export class MailerService {
@@ -189,36 +190,46 @@ export class MailerService {
     }
 
     public async generateInvoicePDF(invoice: Invoice): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            const doc = new PDFDocument();
+        const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
 
-            const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
-            
-            // Crear el archivo PDF
-            const writeStream = fs.createWriteStream(pdfPath);
-            doc.pipe(writeStream);
+        const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
 
-            // Escribir los datos en el PDF
-            doc.fontSize(20).text('Factura', { align: 'center' });
+        const pdfDoc = pdfMake.createPdf(docDefinition);
 
-            doc.fontSize(14).text('Productos:');
-            invoice.items.forEach((item, index) => {
-                const { productName, price, user } = item.product;
-                doc.fontSize(12).text(`${index + 1}. ${productName} - Vendedor: ${user.userName} - Precio: ${price}`);
+        const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
+            pdfDoc.getBuffer((buffer) => {
+                if (!Buffer.isBuffer(buffer)) {
+                    return reject(new Error('Failed to generate PDF buffer'));
+                }
+                resolve(buffer);
             });
+        });
 
-            doc.fontSize(14).text(`Precio total: ${invoice.price}`);
+        fs.writeFileSync(pdfPath, pdfBytes); // Guarda el archivo PDF
 
-            // Finalizar y cerrar el archivo PDF
-            doc.end();
-            writeStream.on('finish', () => {
-                resolve(pdfPath);
-            });
-        
-            writeStream.on('error', (error) => {
-                reject(error);
-            });
-        })
+        return pdfPath;
     }
 
+    public createInvoice(invoice: Invoice): any {
+        return {
+            content: [
+                { text: 'Factura', style: 'header' },
+                'Productos:',
+                {
+                    ul: invoice.items.map((item, index) => ({
+                        text: `${index + 1}. ${item.product.productName} - Vendedor: ${item.product.user.userName} - Precio: ${item.product.price}`,
+                    })),
+                },
+                `Precio total: ${invoice.price}`,
+            ],
+            styles: {
+                header: {
+                    fontSize: 20,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 10],
+                },
+            },
+        };
+    }
 }
