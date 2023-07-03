@@ -150,7 +150,7 @@ export class MailerService {
         const pdfPath = await this.generateInvoicePDF(invoice, sellerView);
 
         if(sellerView) {
-            console.log(`Seller items ${JSON.stringify(invoice.items)}`)
+            console.log(`Seller email ${invoice.items[0].product.user.email}`)
         }
         this.readHTMLFile(path.resolve(__dirname, "./templates/Market/invoice.html"), function (err, html) {
 
