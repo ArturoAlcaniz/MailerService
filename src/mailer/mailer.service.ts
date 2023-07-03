@@ -235,7 +235,7 @@ export class MailerService {
         const imagePath = path.join(__dirname, './templates/Market', 'Logo-TISHOP.png');
 
         const tableBody = invoice.items.map((item, index) => [
-            { text: `${index + 1}. ${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 12 },
+            { text: `${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 12 },
             { text: item.product.price.toString(), alignment: 'right' }
         ]);
     
