@@ -247,7 +247,7 @@ export class MailerService {
     
         const title = 'Invoice';
         const invoiceId = `Invoice ID: ${invoice.id}`;
-        const buyerName = `Buyer: ${invoice.buyer.userName}`;
+        const buyerName = `${invoice.buyer.userName}`;
     
         return {
             content: [
@@ -259,8 +259,7 @@ export class MailerService {
                 },
                 { text: title, style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
                 { text: invoiceId, fontSize: 8, alignment: 'right', margin: [0, 0, 0, 10] },
-                ...(sellerView ? [{ text: 'Products purchased by the user', style: 'productsByUser', alignment: 'left' }] : []),
-                ...(sellerView ? [] : [{ text: buyerName, style: 'buyerName', alignment: 'left', margin: [0, 0, 0, 10] }]),
+                ...(sellerView ? [{ text: `Products purchased by the ${buyerName}`, style: 'productsByUser', alignment: 'left' }] : []),
                 {
                     table: {
                         headerRows: 1,
