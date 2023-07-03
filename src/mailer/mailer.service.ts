@@ -256,7 +256,7 @@ export class MailerService {
                 },
                 { text: title, style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
                 { text: invoiceId, fontSize: 8, alignment: 'right', margin: [0, 0, 0, 10] },
-                ...(sellerView ? [{ text: `Products purchased by the ${buyerName}\n\n`, style: 'productsByUser', alignment: 'left' }] : []),
+                ...(sellerView ? [{ text: 'Products purchased by ', alignment: 'left' }, { text: `${buyerName}\n\n`, style: 'productsByUser', alignment: 'left' }] : []),
                 {
                     table: {
                         headerRows: 1,
