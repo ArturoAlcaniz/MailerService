@@ -276,8 +276,8 @@ export class MailerService {
                     table: {
                         widths: ['50%', '50%'],
                         body: [
-                            sellerView ? ['Payments Received', { text: invoice.price.toString(), alignment: 'right' }] : [],
-                            sellerView ? [formattedDate, ''] : []
+                            sellerView ? [] : ['Payments Received', { text: invoice.price.toString(), alignment: 'right' }],
+                            sellerView ? [] : [formattedDate, '']
                         ]
                     },
                     margin: [0, 40, 0, 0] // Ajusta el margen inferior para agregar más espacio
