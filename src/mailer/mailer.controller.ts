@@ -53,15 +53,29 @@ export class MailerController {
 
     @ApiOkResponse()
     @Post("sendInvoice")
-    async sendIncoice(
+    async sendInvoice(
         @Body() payload: InvoiceDto,
         @Res({passthrough: true}) response: Response
     ) {
         this.logger.info(
-            "Checkout: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
+            "Sending invoice to buyer: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
         );
-        this.mailerService.sendInvoice(payload.invoice);
+        this.mailerService.sendInvoice(payload.invoice, false);
         this.logger.info(`sendInvoice Email Sent to ${payload.invoice.buyer.email}`);
+        response.status(200);
+    }
+
+    @ApiOkResponse()
+    @Post("sendInvoiceSeller")
+    async sendInvoiceSeller(
+        @Body() payload: InvoiceDto,
+        @Res({passthrough: true}) response: Response
+    ) {
+        this.logger.info(
+            "Sending invoice to seller: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
+        );
+        this.mailerService.sendInvoice(payload.invoice, true);
+        this.logger.info(`sendInvoice Email Sent to ${payload.invoice.items[0].product.user.email}`);
         response.status(200);
     }
 }

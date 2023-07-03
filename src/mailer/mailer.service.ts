@@ -143,11 +143,11 @@ export class MailerService {
         })
     }
 
-    public async sendInvoice(invoice: Invoice) {
+    public async sendInvoice(invoice: Invoice, sellerView: boolean) {
 
         let thisOut = this
 
-        const pdfPath = await this.generateInvoicePDF(invoice);
+        const pdfPath = await this.generateInvoicePDF(invoice, sellerView);
 
         this.readHTMLFile(path.resolve(__dirname, "./templates/Market/invoice.html"), function (err, html) {
 
@@ -161,7 +161,7 @@ export class MailerService {
                 let htmlToSend = template(replacements);
                 const mailOptions = {
                     from: thisOut.user,
-                    to: invoice.buyer.email,
+                    to: sellerView ? invoice.items[0].product.user.email : invoice.buyer.email,
                     subject: "[TI-SHOP] Invoice",
                     html: htmlToSend,
                     attachments: [
@@ -187,7 +187,7 @@ export class MailerService {
         })
     }
 
-    public async generateInvoicePDF(invoice: Invoice): Promise<string> {
+    public async generateInvoicePDF(invoice: Invoice, sellerView: boolean): Promise<string> {
         try {
             const fonts = {
                 Roboto: {
@@ -202,7 +202,7 @@ export class MailerService {
     
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
     
-            const docDefinition = this.createInvoice(invoice); // Utiliza la plantilla para generar el contenido del PDF
+            const docDefinition = this.createInvoice(invoice, sellerView); // Utiliza la plantilla para generar el contenido del PDF
     
             const pdfDoc = printer.createPdfKitDocument(docDefinition);
     
@@ -230,17 +230,20 @@ export class MailerService {
         }
     }
 
-    public createInvoice(invoice: Invoice): any {
+    public createInvoice(invoice: Invoice, sellerView: boolean): any {
+
         const imagePath = path.join(__dirname, './templates/Market', 'Logo-TISHOP.png');
 
         const tableBody = invoice.items.map((item, index) => [
-            { text: `${index + 1}. ${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 8 },
-            { text: item.product.user.userName, alignment: 'left' },
+            { text: `${index + 1}. ${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 12 },
             { text: item.product.price.toString(), alignment: 'right' }
         ]);
     
         const today = new Date();
         const formattedDate = `${today.getDate()} - ${this.getMonthName(today.getMonth())} ${today.getFullYear()}`;
+    
+        const title = sellerView ? 'Products purchased by the user' : 'Invoice';
+        const buyerName = sellerView ? `${invoice.buyer.userName}` : '';
     
         return {
             content: [
@@ -250,16 +253,22 @@ export class MailerService {
                     width: 100,
                     margin: [0, 10, 0, 10]
                 },
-                { text: 'Invoice', style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
-                { text: `Invoice ID: ${invoice.id}`, fontSize: 8, alignment: 'right', margin: [0, -10, 0, 20] },
+                { text: title, style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
+                { text: buyerName, style: 'buyerName', alignment: 'right', margin: [0, 0, 0, 20] },
+                {
+                    text: 'Products:',
+                    style: 'productsTitle',
+                    alignment: 'left',
+                    margin: [0, 10, 0, 0]
+                },
                 {
                     table: {
                         headerRows: 1,
-                        widths: ['*', '*', '*'],
+                        widths: sellerView ? ['*', '*'] : ['*', '*', '*'],
                         body: [
                             [
                                 { text: 'Product', style: 'tableHeader', alignment: 'left' },
-                                { text: 'Seller', style: 'tableHeader', alignment: 'left' },
+                                ...(sellerView ? [] : [{ text: 'Seller', style: 'tableHeader', alignment: 'left' }]),
                                 { text: 'Price', style: 'tableHeader', alignment: 'right' }
                             ],
                             ...tableBody
@@ -275,7 +284,7 @@ export class MailerService {
                             [formattedDate, '']
                         ]
                     },
-                    margin: [0, 10, 0, 0]
+                    margin: [0, 40, 0, 0] // Ajusta el margen inferior para agregar más espacio
                 }
             ],
             styles: {
@@ -283,6 +292,17 @@ export class MailerService {
                     fontSize: 20,
                     bold: true,
                     margin: [0, 0, 0, 10],
+                },
+                buyerName: {
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'right',
+                    margin: [0, 0, 0, 20]
+                },
+                productsTitle: {
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 0]
                 },
                 tableHeader: {
                     bold: true,
