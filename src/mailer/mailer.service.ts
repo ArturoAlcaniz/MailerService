@@ -231,8 +231,10 @@ export class MailerService {
     }
 
     public createInvoice(invoice: Invoice): any {
+        const imagePath = path.join(__dirname, './templates/Market', 'Logo-TISHOP.png');
+
         const tableBody = invoice.items.map((item, index) => [
-            { text: `${index + 1}. ${item.product.productName}`, alignment: 'left' },
+            { text: `${index + 1}. ${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 8 },
             { text: item.product.user.userName, alignment: 'left' },
             { text: item.product.price.toString(), alignment: 'right' }
         ]);
@@ -242,8 +244,14 @@ export class MailerService {
     
         return {
             content: [
-                { text: 'Invoice', style: 'header', alignment: 'right' },
-                { text: `Invoice ID: ${invoice.id}`, fontSize: 10, alignment: 'right' },
+                {
+                    alignment: 'center',
+                    image: imagePath,
+                    width: 100,
+                    margin: [0, 10, 0, 10]
+                },
+                { text: 'Invoice', style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
+                { text: `Invoice ID: ${invoice.id}`, fontSize: 8, alignment: 'right', margin: [0, -10, 0, 20] },
                 {
                     table: {
                         headerRows: 1,
