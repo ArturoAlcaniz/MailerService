@@ -199,13 +199,13 @@ export class MailerService {
             };
             const PdfPrinter = require('pdfmake');
             const printer = new PdfPrinter(fonts);
-    
+
             const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
-    
+
             const docDefinition = this.createInvoice(invoice, sellerView); // Utiliza la plantilla para generar el contenido del PDF
-    
+
             const pdfDoc = printer.createPdfKitDocument(docDefinition);
-    
+
             const pdfBytes = await new Promise<Buffer>((resolve, reject) => {
                 const chunks: Uint8Array[] = [];
                 pdfDoc.on('data', (chunk: Uint8Array) => {
@@ -220,9 +220,9 @@ export class MailerService {
                 });
                 pdfDoc.end();
             });
-    
+
             fs.writeFileSync(pdfPath, pdfBytes); // Guarda el archivo PDF
-    
+
             return pdfPath;
         } catch (error) {
             console.error('Error al generar el PDF:', error);
@@ -233,17 +233,18 @@ export class MailerService {
     public createInvoice(invoice: Invoice, sellerView: boolean): any {
 
         const imagePath = path.join(__dirname, './templates/Market', 'Logo-TISHOP.png');
-
         const tableBody = invoice.items.map((item, index) => [
-            { text: `${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 12 },
+            { text: `${item.product.productName}\nID: ${item.product.id}`, alignment: 'left', fontSize: 8 },
+            ...(sellerView ? [] : [{ text: item.product.user.userName, alignment: 'left' }]),
             { text: item.product.price.toString(), alignment: 'right' }
         ]);
     
         const today = new Date();
         const formattedDate = `${today.getDate()} - ${this.getMonthName(today.getMonth())} ${today.getFullYear()}`;
     
-        const title = sellerView ? 'Products purchased by the user' : 'Invoice';
-        const buyerName = sellerView ? `${invoice.buyer.userName}` : '';
+        const title = 'Invoice';
+        const invoiceId = `Invoice ID: ${invoice.id}`;
+        const buyerName = `Buyer: ${invoice.buyer.userName}`;
     
         return {
             content: [
@@ -254,17 +255,13 @@ export class MailerService {
                     margin: [0, 10, 0, 10]
                 },
                 { text: title, style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
-                { text: buyerName, style: 'buyerName', alignment: 'right', margin: [0, 0, 0, 20] },
-                {
-                    text: 'Products:',
-                    style: 'productsTitle',
-                    alignment: 'left',
-                    margin: [0, 10, 0, 0]
-                },
+                { text: invoiceId, fontSize: 8, alignment: 'right', margin: [0, 0, 0, 10] },
+                ...(sellerView ? [{ text: 'Products purchased by the user', style: 'productsByUser', alignment: 'left' }] : []),
+                ...(sellerView ? [] : [{ text: buyerName, style: 'buyerName', alignment: 'left', margin: [0, 0, 0, 10] }]),
                 {
                     table: {
                         headerRows: 1,
-                        widths: sellerView ? ['*', '*'] : ['*', '*', '*'],
+                        widths: ['*', ...(sellerView ? [] : ['*']), '*'],
                         body: [
                             [
                                 { text: 'Product', style: 'tableHeader', alignment: 'left' },
@@ -296,10 +293,10 @@ export class MailerService {
                 buyerName: {
                     fontSize: 12,
                     bold: true,
-                    alignment: 'right',
-                    margin: [0, 0, 0, 20]
+                    alignment: 'left',
+                    margin: [0, 0, 0, 10]
                 },
-                productsTitle: {
+                productsByUser: {
                     fontSize: 12,
                     bold: true,
                     margin: [0, 10, 0, 0]
@@ -318,7 +315,7 @@ export class MailerService {
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
         ];
-    
+
         return monthNames[month];
     }
 }
