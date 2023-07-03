@@ -149,6 +149,9 @@ export class MailerService {
 
         const pdfPath = await this.generateInvoicePDF(invoice, sellerView);
 
+        if(sellerView) {
+            console.log(`Seller items ${invoice.items}`)
+        }
         this.readHTMLFile(path.resolve(__dirname, "./templates/Market/invoice.html"), function (err, html) {
 
             if (err) {
