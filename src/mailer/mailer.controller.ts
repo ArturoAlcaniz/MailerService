@@ -72,7 +72,7 @@ export class MailerController {
         @Res({passthrough: true}) response: Response
     ) {
         this.logger.info(
-            "Sending invoice to seller: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
+            "Sending invoice to seller {SELLER}: {INVOICE}".replace("{SELLER}", payload.invoice.items[0].product.user.email).replace("{INVOICE}", JSON.stringify(payload.invoice))
         );
         this.mailerService.sendInvoice(payload.invoice, true);
         response.status(200);

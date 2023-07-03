@@ -203,7 +203,7 @@ export class MailerService {
             const PdfPrinter = require('pdfmake');
             const printer = new PdfPrinter(fonts);
 
-            const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}.pdf`);
+            const pdfPath = path.join(__dirname, '..', '..', 'files', `invoice-${invoice.id}${sellerView ? '-'+invoice.items[0].product.user.userName : ''}.pdf`);
 
             const docDefinition = this.createInvoice(invoice, sellerView); // Utiliza la plantilla para generar el contenido del PDF
 
