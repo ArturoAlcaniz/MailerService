@@ -149,10 +149,7 @@ export class MailerService {
 
         const pdfPath = await this.generateInvoicePDF(invoice, sellerView);
 
-        if(sellerView) {
-            console.log(`Seller email ${invoice.items[0].product.user.email}`)
-        }
-        this.readHTMLFile(path.resolve(__dirname, "./templates/Market/invoice.html"), function (err, html) {
+        this.readHTMLFile(path.resolve(__dirname, `./templates/Market/invoice${sellerView ? '-seller' : ''}.html`), function (err, html) {
 
             if (err) {
                 console.log(err)
@@ -259,7 +256,7 @@ export class MailerService {
                 },
                 { text: title, style: 'header', alignment: 'right', margin: [0, 0, 0, 0] },
                 { text: invoiceId, fontSize: 8, alignment: 'right', margin: [0, 0, 0, 10] },
-                ...(sellerView ? [{ text: `Products purchased by the ${buyerName}`, style: 'productsByUser', alignment: 'left' }] : []),
+                ...(sellerView ? [{ text: `Products purchased by the ${buyerName}\n\n`, style: 'productsByUser', alignment: 'left' }] : []),
                 {
                     table: {
                         headerRows: 1,
@@ -279,8 +276,8 @@ export class MailerService {
                     table: {
                         widths: ['50%', '50%'],
                         body: [
-                            ['Payments Received', { text: invoice.price.toString(), alignment: 'right' }],
-                            [formattedDate, '']
+                            sellerView ? ['Payments Received', { text: invoice.price.toString(), alignment: 'right' }] : [],
+                            sellerView ? [formattedDate, ''] : []
                         ]
                     },
                     margin: [0, 40, 0, 0] // Ajusta el margen inferior para agregar más espacio

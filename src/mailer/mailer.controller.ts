@@ -57,11 +57,7 @@ export class MailerController {
         @Body() payload: InvoiceDto,
         @Res({passthrough: true}) response: Response
     ) {
-        this.logger.info(
-            "Sending invoice to buyer: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
-        );
         this.mailerService.sendInvoice(payload.invoice, false);
-        this.logger.info(`sendInvoice Email Sent to ${payload.invoice.buyer.email}`);
         response.status(200);
     }
 
@@ -71,9 +67,6 @@ export class MailerController {
         @Body() payload: InvoiceDto,
         @Res({passthrough: true}) response: Response
     ) {
-        this.logger.info(
-            "Sending invoice to seller {SELLER}: {INVOICE}".replace("{SELLER}", payload.invoice.items[0].product.user.email).replace("{INVOICE}", JSON.stringify(payload.invoice))
-        );
         this.mailerService.sendInvoice(payload.invoice, true);
         response.status(200);
     }
