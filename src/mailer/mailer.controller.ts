@@ -75,7 +75,6 @@ export class MailerController {
             "Sending invoice to seller: {INVOICE}".replace("{INVOICE}", JSON.stringify(payload.invoice))
         );
         this.mailerService.sendInvoice(payload.invoice, true);
-        this.logger.info(`sendInvoice Email Sent to ${payload.invoice.items[0].product.user.email}`);
         response.status(200);
     }
 }
